@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict #type: ignore
 
 
 class ItemCreate(BaseModel):
@@ -9,9 +9,15 @@ class ItemCreate(BaseModel):
 
 
 class ItemRead(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     id: int
     titre: str
     description: str | None
     tarif_jour: float
     disponible: bool
 
+class ItemUpdate(BaseModel):
+    titre: str | None = Field(default=None, min_length=3, max_length=120)
+    description: str | None = Field(default=None, max_length=1000)
+    tarif_jour: float | None = Field(default=None, gt=0)
+    disponible: bool | None = None
