@@ -1,9 +1,20 @@
 services:
-  api:
-    build: .
+  backend:
+    build: ./backend
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/code/app
-      - ./tests:/code/tests
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      - ./backend/app:/app/app
+      - ./backend/tests:/app/tests
+
+  frontend:
+    build: ./frontend 
+    ports:
+      - "8080:8080"
+    environment:
+      API_BASE_URL: "http://backend:8000"
+    volumes:
+      - ./frontend/app:/app/app
+    depends_on:
+      - backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload

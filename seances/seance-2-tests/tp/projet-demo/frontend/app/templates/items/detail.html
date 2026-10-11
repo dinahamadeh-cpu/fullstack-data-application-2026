@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}{{ item.titre }} — GearShare{% endblock %}
+
+{% block content %}
+<p><a href="/items">← Retour à la liste</a></p>
+
+{% if request.query_params.get("reservation") == "ok" %}
+  <p class="alerte alerte-succes">Réservation effectuée avec succès !</p>
+{% endif %}
+{% if request.query_params.get("annulation") == "ok" %}
+  <p class="alerte alerte-succes">Réservation annulée.</p>
+{% endif %}
+{% if erreur_globale %}
+  <p class="alerte alerte-erreur">{{ erreur_globale }}</p>
+{% endif %}
+
+<h1>{{ item.titre }}</h1>
+<p><strong>Tarif :</strong> {{ item.tarif_jour }} € / jour</p>
+<p><strong>Statut :</strong> {{ "Disponible" if item.disponible else "Indisponible" }}</p>
+<p><strong>Description :</strong> {{ item.description or "Aucune description." }}</p>
+
+<hr>
+
+<h2>Réserver ce matériel</h2>
+{% if erreurs_reservation %}
+  <div class="alerte alerte-erreur">
+    <ul>
+      {% for err in erreurs_reservation %}
+        <li>{{ err }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<form method="post" action="/items/{{ item.id }}/reservations">
+  <label for="date_debut">Du :</label>
+  <input type="date" id="date_debut" name="date_debut" value="{{ saisie.date_debut if saisie else '' }}" required>
+
+  <label for="date_fin">Au :</label>
+  <input type="date" id="date_fin" name="date_fin" value="{{ saisie.date_fin if saisie else '' }}" required>
+
+  <button type="submit">Réserver</button>
+</form>
+
+<hr>
+
+<h2>Réservations existantes</h2>
+{% if reservations %}
+  <table>
+    <thead>
+      <tr>
+        <th>Début</th>
+        <th>Fin</th>
+        <th>Statut</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in reservations %}
+        <tr>
+          <td>{{ r.date_debut }}</td>
+          <td>{{ r.date_fin }}</td>
+          <td>{{ r.statut }}</td>
+          <td>
+            {% if r.statut == "active" %}
+              <form method="post" action="/reservations/{{ r.id }}" style="margin:0;">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <button type="submit" style="background:#dc2626;">Annuler</button>
+              </form>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Aucune réservation sur cet objet.</p>
+{% endif %}
+
+{% endblock %}
