@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Objets disponibles — GearShare{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <h1>Matériel disponible</h1>
+  <a href="/items/new" class="btn">+ Proposer un objet</a>
+</div>
+
+{% if items %}
+  <table>
+    <thead>
+      <tr>
+        <th>Titre</th>
+        <th>Tarif journalier</th>
+        <th>Statut</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+        <tr>
+          <td><a href="/items/{{ item.id }}">{{ item.titre }}</a></td>
+          <td>{{ item.tarif_jour }} €</td>
+          <td>{{ "Disponible" if item.disponible else "Indisponible" }}</td>
+          <td><a href="/items/{{ item.id }}">Voir fiche</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Aucun matériel n'est disponible pour le moment.</p>
+{% endif %}
+{% endblock %}
